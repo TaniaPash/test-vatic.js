@@ -766,7 +766,8 @@ const updatePosition = function (param, value) {
   } else if (param === 'left') {
     initValue = position.left
   }
-  bbox.css(`${param}`, (initValue + value));
+  const newValue = Math.round(initValue + value);
+  bbox.css(`${param}`, newValue);
   let bbox2 = new BoundingBox(Math.round(position.left), Math.round(position.top), Math.round(bbox.width()), Math.round(bbox.height()));
   const frameNo = player.currentFrame;
   annotatedObjectsTracker.annotatedObjects[0].frames[frameNo].bbox = bbox2;
