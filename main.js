@@ -783,6 +783,9 @@ const updatePosition = function (param, value) {
   }
   const newValue = Math.round(initValue + value);
   bbox.css(`${param}`, newValue);
+  if(bbox.css(`${param}`) === initValue+"px"){
+    alert(`please use mouse to adjust this border`)
+  }
   let bbox2 = new BoundingBox(Math.round(position.left), Math.round(position.top), Math.round(bbox.width()), Math.round(bbox.height()));
   const index = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBoxes[0].name);
   const frameNo = player.currentFrame;
