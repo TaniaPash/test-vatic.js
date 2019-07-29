@@ -463,6 +463,7 @@ function addAnnotatedObjectControls(annotatedObject) {
   let visible = $('<input type="checkbox" id="visible" checked="checked" />');
   annotatedObject.visible = visible;
   visible.change(function () {
+    console.log("adsf")
     let bbox;
     if (this.checked) {
       annotatedObject.dom.style.display = 'block';
@@ -697,9 +698,8 @@ shortcut('shift q', document.body).bindsTo(function (e) {
   if (annotatedObjectsTracker.annotatedObjects.length > 1) {
     alert(`Shortcuts disable because ${annotatedObjectsTracker.annotatedObjects.length} boxes are visible`)
   }
-  const visible = $("visible");
-  const checked = visible.prop('checked');
-  visible.prop('checked', !checked).change();
+  const visible = $("#visible");
+  visible.click()
 })
 
 // move top
