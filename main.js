@@ -690,8 +690,14 @@ window.onkeydown = function (e) {
 
 
 function getActiveBoxes() {
-  const frameNo = player.currentFrame;
-  return annotatedObjectsTracker.annotatedObjects.filter(o => o.frames[frameNo].bbox);
+  let activeBoxes = [];
+  annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
+    const activeFrame = annotatedObj.frames.length - 1;
+    if (annotatedObj.frames[activeFrame].bbox) {
+      activeBoxes.push(annotatedObj);
+    }
+  })
+  return activeBoxes;
 }
 
 // Bind to Alt+n
@@ -783,7 +789,7 @@ const updatePosition = function (param, value) {
   }
   const newValue = Math.round(initValue + value);
   bbox.css(`${param}`, newValue);
-  if(bbox.css(`${param}`) === initValue+"px"){
+  if (bbox.css(`${param}`) === initValue + "px") {
     alert(`please use mouse to adjust this border`)
   }
   let bbox2 = new BoundingBox(Math.round(position.left), Math.round(position.top), Math.round(bbox.width()), Math.round(bbox.height()));
