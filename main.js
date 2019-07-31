@@ -791,8 +791,10 @@ const updatePosition = function (param, value) {
     alert(`please use mouse to adjust this border`)
   }
   let bbox2 = new BoundingBox(Math.round(position.left), Math.round(position.top), Math.round(bbox.width()), Math.round(bbox.height()));
-  const index = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBoxes[0].name);
+  const annotatedObjIndex = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBoxes[0].name);
+  const annotatedObj = annotatedObjectsTracker.annotatedObjects[annotatedObjIndex];
   const frameNo = player.currentFrame;
-  annotatedObjectsTracker.annotatedObjects[index].frames[frameNo].bbox = bbox2;
+  const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === frameNo)
+  annotatedObjectsTracker.annotatedObjects[annotatedObjIndex].frames[frameIndex].bbox = bbox2;
   return annotatedObjectsTracker;
 }
