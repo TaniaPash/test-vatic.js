@@ -772,10 +772,14 @@ const updatePosition = function (param, value) {
     alert(`Shortcuts disable because ${annotatedObjectsTracker.annotatedObjects.length} boxes are visible`);
     return annotatedObjectsTracker;
   }
-  const boxNumber = annotatedObjectsTracker.annotatedObjects.length;
+  const annotatedObjIndex = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBoxes[0].name);
+  const annotatedObj = annotatedObjectsTracker.annotatedObjects[annotatedObjIndex];
+  const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === player.currentFrame)
+  const boxNumber = (annotatedObjIndex + 1);
+
   const bbox = $('#bbox' + boxNumber);
   const position = bbox.position();
-  console.log(bbox.position(), "width:",bbox.width(), "height",bbox.height())
+  console.log(bbox.position(), "width:", bbox.width(), "height", bbox.height())
   let initValue;
   if (param === 'width') {
     initValue = bbox.width()
@@ -792,10 +796,7 @@ const updatePosition = function (param, value) {
     alert(`please use mouse to adjust this border`)
   }
   let bbox2 = new BoundingBox(Math.round(position.left), Math.round(position.top), Math.round(bbox.width()), Math.round(bbox.height()));
-  const annotatedObjIndex = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBoxes[0].name);
-  const annotatedObj = annotatedObjectsTracker.annotatedObjects[annotatedObjIndex];
-  const frameNo = player.currentFrame;
-  const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === frameNo)
+
   annotatedObjectsTracker.annotatedObjects[annotatedObjIndex].frames[frameIndex].bbox = bbox2;
   return annotatedObjectsTracker;
 }
