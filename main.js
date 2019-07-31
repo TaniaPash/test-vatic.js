@@ -775,6 +775,7 @@ const updatePosition = function (param, value) {
   const boxNumber = annotatedObjectsTracker.annotatedObjects.length;
   const bbox = $('#bbox' + boxNumber);
   const position = bbox.position();
+  console.log(bbox.position(), "width:",bbox.width(), "height",bbox.height())
   let initValue;
   if (param === 'width') {
     initValue = bbox.width()
