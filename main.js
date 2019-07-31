@@ -450,6 +450,7 @@ function addAnnotatedObjectControls(annotatedObject) {
 
   let id = $('<input type="text" value="ID?" />');
   id.prop('value', labelName)
+  annotatedObject.id = id.prop('value');
   if (annotatedObject.id) {
     id.val(annotatedObject.id);
   }
