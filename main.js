@@ -37,9 +37,9 @@ let generateXmlButton = document.querySelector('#generateXml');
 let framesManager = new FramesManager();
 let annotatedObjectsTracker = new AnnotatedObjectsTracker(framesManager);
 
-getNextKey = function ({ lastKey, classname }) {
+getNextKey = function ({ lastKey }) {
   if (!lastKey) {
-    return `A_${classname}`
+    return `A`;
   }
   let nextKey;
 
@@ -51,19 +51,13 @@ getNextKey = function ({ lastKey, classname }) {
     var lastChar = lastKey.slice(-1);
     var sub = lastKey.slice(0, -1);
     if (lastChar === 'Z') {
-      nextKey = getNextKey(sub) + String.fromCharCode(lastChar.charCodeAt() - 25);
+      nextKey = getNextKey({ lastKey: sub }) + String.fromCharCode(lastChar.charCodeAt() - 25);
     } else {
       nextKey = sub + String.fromCharCode(lastChar.charCodeAt() + 1);
     }
   }
-  return `${nextKey}_${classname}`
+  return `${nextKey}`
 };
-
-
-
-
-
-
 
 let slider = {
   init: function (min, max, onChange) {
@@ -442,7 +436,10 @@ function addAnnotatedObjectControls(annotatedObject) {
     });
     lastKey = keys.pop().match(/(\w*)_\w*/)[1]
   }
-  name.prop('value', getNextKey({ lastKey, classname: 'ball' }))
+  const classname = 'ball';
+  const labelName = getNextKey({ lastKey }) + '_' + classname;
+  console.log(labelName)
+  name.prop('value', labelName)
   annotatedObject.name = name.prop('value');
   if (annotatedObject.name) {
     name.val(annotatedObject.name);
