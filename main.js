@@ -33,6 +33,7 @@ let frameCount = $('#frameCount');
 let speedInput = document.querySelector('#speed');
 let sliderElement = document.querySelector('#slider');
 let generateXmlButton = document.querySelector('#generateXml');
+const classname = 'ball';
 
 let framesManager = new FramesManager();
 let annotatedObjectsTracker = new AnnotatedObjectsTracker(framesManager);
@@ -436,9 +437,8 @@ function addAnnotatedObjectControls(annotatedObject) {
     });
     lastKey = keys.pop().match(/(\w*)_\w*/)[1]
   }
-  const classname = 'ball';
+
   const labelName = getNextKey({ lastKey }) + '_' + classname;
-  console.log(labelName)
   name.prop('value', labelName)
   annotatedObject.name = name.prop('value');
   if (annotatedObject.name) {
@@ -449,7 +449,7 @@ function addAnnotatedObjectControls(annotatedObject) {
   });
 
   let id = $('<input type="text" value="ID?" />');
-  id.prop('value', name.prop('value'))
+  id.prop('value', labelName)
   if (annotatedObject.id) {
     id.val(annotatedObject.id);
   }
