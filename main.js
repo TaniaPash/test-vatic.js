@@ -435,24 +435,29 @@ function addAnnotatedObjectControls(annotatedObject) {
       return a.length - b.length || // sort by length, if equal then
         a.localeCompare(b);    // sort by dictionary order
     });
-    lastKey = keys.pop().match(/(\w*)_\w*/)[1]
+    const match = keys.pop().match(/(\w*)_\w*/);
+    if (match) {
+      lastKey = match[1]
+    }
   }
 
   const labelName = getNextKey({ lastKey }) + '_' + classname;
-  name.prop('value', labelName)
-  annotatedObject.name = name.prop('value');
   if (annotatedObject.name) {
     name.val(annotatedObject.name);
+  } else {
+    name.prop('value', labelName)
+    annotatedObject.name = name.prop('value');
   }
   name.on('change keyup paste mouseup', function () {
     annotatedObject.name = this.value;
   });
 
   let id = $('<input type="text" value="ID?" />');
-  id.prop('value', labelName)
-  annotatedObject.id = id.prop('value');
   if (annotatedObject.id) {
     id.val(annotatedObject.id);
+  } else {
+    id.prop('value', labelName)
+    annotatedObject.id = id.prop('value');
   }
   id.on('change keyup paste mouseup', function () {
     annotatedObject.id = this.value;
@@ -689,9 +694,10 @@ window.onkeydown = function (e) {
 
 function getActiveBoxes() {
   let activeBoxes = [];
+  console.log(player.currentFrame);
   annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
-    const activeFrame = annotatedObj.frames.length - 1;
-    if (annotatedObj.frames[activeFrame].bbox) {
+    const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === player.currentFrame);
+    if (annotatedObj.frames[frameIndex] && annotatedObj.frames[frameIndex].bbox != null) {
       activeBoxes.push(annotatedObj);
     }
   })
@@ -700,22 +706,63 @@ function getActiveBoxes() {
 
 // Bind to Alt+n
 shortcut('optn n', document.body).bindsTo(function (e) {
+  // remove tmpId tag from all objects
+  annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
+    if (annotatedObj.visible[0].tmpId) {
+      const visibleId = annotatedObj.visible[0].id;
+      const visible = $(`#${visibleId}`);
+      visible.removeProp("tmpId");
+    }
+  })
+  // restyle cursor
   doodle.style.cursor = 'crosshair';
 });
 
-// toggle is visible? checkbox
+// toggle is visible? checkbox on current frame
 shortcut('shift q', document.body).bindsTo(function (e) {
   e.preventDefault();
-  const index = annotatedObjectsTracker.annotatedObjects.length;
-  const visible = $("#visible" + index);
   const activeBoxes = getActiveBoxes();
   if (activeBoxes.length > 1) {
-    alert(`Shortcuts disable because ${activeBoxes.length} boxes are visible`);
-    return visible;
+    alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
+    return annotatedObjectsTracker;
+  }
+  let toggleVisible = []
+  annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
+    if (annotatedObj.visible[0].tmpId) {
+      toggleVisible.push(annotatedObj);
+    }
+  })
+  // check if there are any boxes with id toggle
+  if (toggleVisible.length > 0) {
+    const visibleId = toggleVisible[0].visible[0].id;
+    const visible = $(`#${visibleId}`);
+    visible.removeProp("tmpId");
+    visible.click();
+    return visible
+  } else {
+    // search for box with checked visible;
+    const visibleId = activeBoxes[0].visible[0].id;
+    const visible = $(`#${visibleId}`);
+    visible.prop('tmpId', `${visibleId}-toggle`)
+    visible.click();
+    return visible
+  }
+})
+// get name of active label
+shortcut('shift z', document.body).bindsTo(function (e) {
+  e.preventDefault();
+  const activeBoxes = getActiveBoxes();
+  console.log(activeBoxes)
+  if (activeBoxes.length > 1) {
+    alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
+    return annotatedObjectsTracker;
+  } else if (activeBoxes.length === 1) {
+    const activeBoxName = activeBoxes[0].name;
+    alert(`${activeBoxName}`)
+  } else {
+    alert(`no active boxes`)
   }
 
-  visible.click();
-  return visible
 })
 
 // move top
@@ -769,7 +816,7 @@ shortcut('shift d', document.body).bindsTo(function (e) {
 const updatePosition = function (param, value) {
   const activeBoxes = getActiveBoxes()
   if (activeBoxes.length > 1) {
-    alert(`Shortcuts disable because ${annotatedObjectsTracker.annotatedObjects.length} boxes are visible`);
+    alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
     return annotatedObjectsTracker;
   }
   const annotatedObjIndex = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBoxes[0].name);
