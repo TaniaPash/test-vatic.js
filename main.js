@@ -673,7 +673,11 @@ window.onkeydown = function (e) {
 
   if (e.keyCode === 9) { // TAB - toggle active box
     const boxes = getActiveBoxes();
-    const activeObjIndex = boxes.findIndex(o => o.active === true);
+    let activeObjIndex = boxes.findIndex(o => o.active === true);
+    if(activeObjIndex = -1){
+      activeObjIndex = 0;
+    }
+    console.log(activeObjIndex)
     boxes[activeObjIndex].active = false;
     boxes[activeObjIndex].dom.className = "inactiveBbox ui-resizable ui-draggable"
 
