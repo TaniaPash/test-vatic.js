@@ -462,7 +462,9 @@ function addAnnotatedObjectControls(annotatedObject) {
   id.on('change keyup paste mouseup', function () {
     annotatedObject.id = this.value;
   });
-
+  annotatedObjectsTracker.annotatedObjects.forEach(obj => { obj.active = false; })
+  annotatedObject.active = true;
+  annotatedObjectsTracker.annotatedObjects.forEach(obj => { if (obj.active === false) { obj.dom.className = "inactiveBbox ui-resizable ui-draggable" } })
   let visibleLabel = $('<label>');
   let number = annotatedObjectsTracker.annotatedObjects.length;
   let visible = $(`<input type="checkbox" id=visible${number} checked="checked" />`);
@@ -669,8 +671,22 @@ function importXml() {
 window.onkeydown = function (e) {
   let preventDefault = true;
 
-  if (e.keyCode === 32) { // space
-    player.toogle();
+  if (e.keyCode === 32) { // space - toggle active box
+    const boxes = getActiveBoxes();
+    const activeObjIndex = boxes.findIndex(o => o.active === true);
+    boxes[activeObjIndex].active = false;
+    boxes[activeObjIndex].dom.className = "inactiveBbox ui-resizable ui-draggable"
+
+    // next index
+    let nextBoxIndex;
+    if (activeObjIndex === (boxes.length - 1)) {
+      nextBoxIndex = 0;
+    } else {
+      nextBoxIndex = activeObjIndex + 1;
+    }
+    boxes[nextBoxIndex].active = true;
+    boxes[nextBoxIndex].dom.className = "bbox ui-resizable ui-draggable"
+
   } else if (e.keyCode === 27) { // escape
     if (tmpAnnotatedObject != null) {
       doodle.removeChild(tmpAnnotatedObject.dom);
@@ -694,7 +710,7 @@ window.onkeydown = function (e) {
 
 function getActiveBoxes() {
   let activeBoxes = [];
-  console.log(player.currentFrame);
+  console.log("CurrentFrame is: ", player.currentFrame);
   annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
     const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === player.currentFrame);
     if (annotatedObj.frames[frameIndex] && annotatedObj.frames[frameIndex].bbox != null) {
@@ -702,6 +718,34 @@ function getActiveBoxes() {
     }
   })
   return activeBoxes;
+}
+function getAllActiveBoxes() {
+  let activeBoxes = [];
+  console.log("CurrentFrame is: ", player.currentFrame);
+  annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
+    const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === player.currentFrame);
+
+    if (annotatedObj.frames[frameIndex] && annotatedObj.frames[frameIndex].bbox != null && annotatedObj.active) {
+      activeBoxes.push(annotatedObj);
+    }
+  })
+  return activeBoxes;
+}
+
+function getActiveBox() {
+  console.log("CurrentFrame is: ", player.currentFrame);
+  console.log("Number of Boxes is: ", annotatedObjectsTracker.annotatedObjects.length);
+  const activeBoxes = getAllActiveBoxes();
+  if (activeBoxes.length === 0) {
+    console.log("no Active boxes, assign first box as an Active");
+    const boxes = getActiveBoxes();
+    boxes[0].active = true;
+    return boxes[0];
+  }
+  if (activeBoxes.length > 1) {
+    throw new Error(`Active Box should be 1 but got ${activeBoxes.length}`)
+  }
+  return activeBoxes[0];
 }
 
 // Bind to Alt+n
@@ -722,10 +766,10 @@ shortcut('optn n', document.body).bindsTo(function (e) {
 shortcut('shift q', document.body).bindsTo(function (e) {
   e.preventDefault();
   const activeBoxes = getActiveBoxes();
-  if (activeBoxes.length > 1) {
-    alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
-    return annotatedObjectsTracker;
-  }
+  // if (activeBoxes.length > 1) {
+  //   alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
+  //   return annotatedObjectsTracker;
+  // }
   let toggleVisible = []
   annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
     if (annotatedObj.visible[0].tmpId) {
@@ -752,7 +796,6 @@ shortcut('shift q', document.body).bindsTo(function (e) {
 shortcut('shift z', document.body).bindsTo(function (e) {
   e.preventDefault();
   const activeBoxes = getActiveBoxes();
-  console.log(activeBoxes)
   if (activeBoxes.length > 1) {
     alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
     return annotatedObjectsTracker;
@@ -814,19 +857,20 @@ shortcut('shift d', document.body).bindsTo(function (e) {
 })
 
 const updatePosition = function (param, value) {
-  const activeBoxes = getActiveBoxes()
-  if (activeBoxes.length > 1) {
-    alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
-    return annotatedObjectsTracker;
-  }
-  const annotatedObjIndex = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBoxes[0].name);
+  // const activeBoxes = getActiveBoxes()
+  /*  if (activeBoxes.length > 1) {
+     alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
+     return annotatedObjectsTracker;
+   } */
+  const activeBox = getActiveBox()
+  const annotatedObjIndex = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBox.name);
   const annotatedObj = annotatedObjectsTracker.annotatedObjects[annotatedObjIndex];
   const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === player.currentFrame)
   const boxNumber = (annotatedObjIndex + 1);
 
   const bbox = $('#bbox' + boxNumber);
   const position = bbox.position();
-  console.log(bbox.position(), "width:", bbox.width(), "height", bbox.height())
+  // console.log(bbox.position(), "width:", bbox.width(), "height", bbox.height())
   let initValue;
   if (param === 'width') {
     initValue = bbox.width()
