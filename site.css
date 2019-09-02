@@ -23,6 +23,14 @@
   opacity: 0.3;
   box-sizing: unset;
 }
+.inactiveBbox {
+  /* border width MUST be given in pixels */
+  border: 1px solid rgb(0, 110, 255);
+  position: absolute;
+  z-index: 3;
+  opacity: 0.3;
+  box-sizing: unset;
+}
 
 .bbox:hover,
 .handle:hover,
