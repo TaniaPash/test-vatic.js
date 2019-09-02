@@ -671,7 +671,7 @@ function importXml() {
 window.onkeydown = function (e) {
   let preventDefault = true;
 
-  if (e.keyCode === 32) { // space - toggle active box
+  if (e.keyCode === 9) { // TAB - toggle active box
     const boxes = getActiveBoxes();
     const activeObjIndex = boxes.findIndex(o => o.active === true);
     boxes[activeObjIndex].active = false;
