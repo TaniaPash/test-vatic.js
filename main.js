@@ -674,7 +674,7 @@ window.onkeydown = function (e) {
   if (e.keyCode === 9) { // TAB - toggle active box
     const boxes = getActiveBoxes();
     let activeObjIndex = boxes.findIndex(o => o.active === true);
-    if(activeObjIndex = -1){
+    if (activeObjIndex = -1) {
       activeObjIndex = 0;
     }
     console.log(activeObjIndex)
@@ -691,7 +691,10 @@ window.onkeydown = function (e) {
     boxes[nextBoxIndex].active = true;
     boxes[nextBoxIndex].dom.className = "bbox ui-resizable ui-draggable"
 
-  } else if (e.keyCode === 27) { // escape
+  } if (e.keyCode === 32) { // space
+    player.toogle();
+  }
+  else if (e.keyCode === 27) { // escape
     if (tmpAnnotatedObject != null) {
       doodle.removeChild(tmpAnnotatedObject.dom);
       tmpAnnotatedObject = null;
