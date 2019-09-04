@@ -672,7 +672,7 @@ window.onkeydown = function (e) {
   let preventDefault = true;
 
   if (e.keyCode === 9) { // TAB - toggle active box
-    const boxes = getActiveBoxes();
+    const boxes = getAllVisibleBoxes();
     console.log(boxes)
     let activeObjIndex = boxes.findIndex(o => o.active === true);
     if (activeObjIndex === -1) {
@@ -715,7 +715,7 @@ window.onkeydown = function (e) {
 };
 
 
-function getActiveBoxes() {
+function getAllVisibleBoxes() {
   let activeBoxes = [];
   console.log("CurrentFrame is: ", player.currentFrame);
   annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
@@ -731,7 +731,6 @@ function getAllActiveBoxes() {
   console.log("CurrentFrame is: ", player.currentFrame);
   annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
     const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === player.currentFrame);
-
     if (annotatedObj.frames[frameIndex] && annotatedObj.frames[frameIndex].bbox != null && annotatedObj.active) {
       activeBoxes.push(annotatedObj);
     }
@@ -745,7 +744,7 @@ function getActiveBox() {
   const activeBoxes = getAllActiveBoxes();
   if (activeBoxes.length === 0) {
     console.log("no Active boxes, assign first box as an Active");
-    const boxes = getActiveBoxes();
+    const boxes = getAllVisibleBoxes();
     boxes[0].active = true;
     return boxes[0];
   }
@@ -772,18 +771,12 @@ shortcut('optn n', document.body).bindsTo(function (e) {
 // toggle is visible? checkbox on current frame
 shortcut('shift q', document.body).bindsTo(function (e) {
   e.preventDefault();
-  const activeBoxes = getActiveBoxes();
-  // if (activeBoxes.length > 1) {
-  //   alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
-  //   return annotatedObjectsTracker;
-  // }
   let toggleVisible = []
   annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
     if (annotatedObj.visible[0].tmpId) {
       toggleVisible.push(annotatedObj);
     }
   })
-  // check if there are any boxes with id toggle
   if (toggleVisible.length > 0) {
     const visibleId = toggleVisible[0].visible[0].id;
     const visible = $(`#${visibleId}`);
@@ -791,18 +784,18 @@ shortcut('shift q', document.body).bindsTo(function (e) {
     visible.click();
     return visible
   } else {
-    // search for box with checked visible;
-    const visibleId = activeBoxes[0].visible[0].id;
+    const activeBox = getActiveBox();
+    const visibleId = activeBox.visible[0].id;
     const visible = $(`#${visibleId}`);
     visible.prop('tmpId', `${visibleId}-toggle`)
     visible.click();
-    return visible
+    return visible;
   }
 })
 // get name of active label
 shortcut('shift z', document.body).bindsTo(function (e) {
   e.preventDefault();
-  const activeBoxes = getActiveBoxes();
+  const activeBoxes = getAllVisibleBoxes();
   if (activeBoxes.length > 1) {
     alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
     return annotatedObjectsTracker;
@@ -864,11 +857,6 @@ shortcut('shift d', document.body).bindsTo(function (e) {
 })
 
 const updatePosition = function (param, value) {
-  // const activeBoxes = getActiveBoxes()
-  /*  if (activeBoxes.length > 1) {
-     alert(`Shortcuts are disabled because ${activeBoxes.length} boxes are visible`);
-     return annotatedObjectsTracker;
-   } */
   const activeBox = getActiveBox()
   const annotatedObjIndex = annotatedObjectsTracker.annotatedObjects.findIndex(o => o.name === activeBox.name);
   const annotatedObj = annotatedObjectsTracker.annotatedObjects[annotatedObjIndex];
@@ -877,7 +865,6 @@ const updatePosition = function (param, value) {
 
   const bbox = $('#bbox' + boxNumber);
   const position = bbox.position();
-  // console.log(bbox.position(), "width:", bbox.width(), "height", bbox.height())
   let initValue;
   if (param === 'width') {
     initValue = bbox.width()
