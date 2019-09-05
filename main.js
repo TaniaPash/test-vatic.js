@@ -771,7 +771,7 @@ function getActiveBox() {
     return boxes[0];
   }
   if (activeBoxes.length > 1) {
-    alert(`Active Box should be 1 but got ${activeBoxes.length}`)
+    alert(`Active Box should be 1 but got ${activeBoxes.length}. Please press TAB to choose a box`)
   }
   return activeBoxes[0];
 }
