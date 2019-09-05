@@ -623,7 +623,6 @@ function importXml() {
           annotatedObject.add(new AnnotatedFrame(player.currentFrame, bbox, true));
         }
       );
-
       addAnnotatedObjectControls(annotatedObject);
 
       let lastFrame = -1;
@@ -658,7 +657,12 @@ function importXml() {
         annotatedObject.add(annotatedFrame);
       }
     }
-
+    
+    // In case we are loading annotation: first annotated object shoud be active and other annotated objectes should be inactive
+    annotatedObjectsTracker.annotatedObjects.forEach(obj => { obj.active = false; obj.dom.className = "inactiveBbox ui-resizable ui-draggable" })
+    annotatedObjectsTracker.annotatedObjects[0].active = true;
+    annotatedObjectsTracker.annotatedObjects[0].dom.className = "bbox ui-resizable ui-draggable"
+    
     player.drawFrame(player.currentFrame);
   };
   reader.readAsText(this.files[0]);
@@ -681,6 +685,7 @@ window.onkeydown = function (e) {
   let preventDefault = true;
 
   if (e.keyCode === 9) { // TAB - toggle active box
+    
     const boxes = getAllVisibleBoxes();
     console.log(boxes)
     let activeObjIndex = boxes.findIndex(o => o.active === true);
