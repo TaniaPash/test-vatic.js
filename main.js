@@ -664,7 +664,16 @@ function importXml() {
   reader.readAsText(this.files[0]);
 }
 
-
+const clearToggleId = function () {
+  annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
+    const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === player.currentFrame);
+    if (annotatedObj.frames[frameIndex] && annotatedObj.visible[0].tmpId) {
+      const visibleId = annotatedObj.visible[0].id;
+      const visible = $(`#${visibleId}`);
+      visible.removeProp("tmpId");
+    }
+  })
+}
 
 
 // Keyboard shortcuts
@@ -678,7 +687,7 @@ window.onkeydown = function (e) {
     if (activeObjIndex === -1) {
       activeObjIndex = 0;
     }
-    console.log(activeObjIndex)
+    clearToggleId() // disable visibility toggle for all other boxes
     boxes[activeObjIndex].active = false;
     boxes[activeObjIndex].dom.className = "inactiveBbox ui-resizable ui-draggable"
 
@@ -726,6 +735,19 @@ function getAllVisibleBoxes() {
   })
   return activeBoxes;
 }
+
+function getAllBoxes() {
+  let activeBoxes = [];
+  console.log("CurrentFrame is: ", player.currentFrame);
+  annotatedObjectsTracker.annotatedObjects.forEach(annotatedObj => {
+    const frameIndex = annotatedObj.frames.findIndex(f => f.frameNumber === player.currentFrame);
+    if (annotatedObj.frames[frameIndex]) {
+      activeBoxes.push(annotatedObj);
+    }
+  })
+  return activeBoxes;
+}
+
 function getAllActiveBoxes() {
   let activeBoxes = [];
   console.log("CurrentFrame is: ", player.currentFrame);
@@ -749,7 +771,7 @@ function getActiveBox() {
     return boxes[0];
   }
   if (activeBoxes.length > 1) {
-    throw new Error(`Active Box should be 1 but got ${activeBoxes.length}`)
+    alert(`Active Box should be 1 but got ${activeBoxes.length}`)
   }
   return activeBoxes[0];
 }
