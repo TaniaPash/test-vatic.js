@@ -657,12 +657,12 @@ function importXml() {
         annotatedObject.add(annotatedFrame);
       }
     }
-    
+
     // In case we are loading annotation: first annotated object shoud be active and other annotated objectes should be inactive
     annotatedObjectsTracker.annotatedObjects.forEach(obj => { obj.active = false; obj.dom.className = "inactiveBbox ui-resizable ui-draggable" })
     annotatedObjectsTracker.annotatedObjects[0].active = true;
     annotatedObjectsTracker.annotatedObjects[0].dom.className = "bbox ui-resizable ui-draggable"
-    
+
     player.drawFrame(player.currentFrame);
   };
   reader.readAsText(this.files[0]);
@@ -719,6 +719,7 @@ window.onkeydown = function (e) {
     player.seek(player.currentFrame - 1);
   } else if (e.keyCode == 39) { // right
     player.seek(player.currentFrame + 1);
+    getActiveBox() // load new info to update active boxes on a frame
   } else {
     preventDefault = false;
   }
@@ -769,10 +770,13 @@ function getActiveBox() {
   console.log("CurrentFrame is: ", player.currentFrame);
   console.log("Number of Boxes is: ", annotatedObjectsTracker.annotatedObjects.length);
   const activeBoxes = getAllActiveBoxes();
-  if (activeBoxes.length === 0) {
+  const visibleBoxes = getAllVisibleBoxes()
+  if (activeBoxes.length === 0 && visibleBoxes.length > 0) {
     console.log("no Active boxes, assign first box as an Active");
     const boxes = getAllVisibleBoxes();
+    boxes[0].active;
     boxes[0].active = true;
+    boxes[0].dom.className = "bbox ui-resizable ui-draggable"
     return boxes[0];
   }
   if (activeBoxes.length > 1) {
