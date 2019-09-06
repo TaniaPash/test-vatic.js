@@ -719,7 +719,6 @@ window.onkeydown = function (e) {
     player.seek(player.currentFrame - 1);
   } else if (e.keyCode == 39) { // right
     player.seek(player.currentFrame + 1);
-    getActiveBox() // load new info to update active boxes on a frame
   } else {
     preventDefault = false;
   }
